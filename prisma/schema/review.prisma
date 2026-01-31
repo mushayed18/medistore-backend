@@ -1,0 +1,18 @@
+model Review {
+  id         String   @id @default(uuid())
+  rating     Int      
+  comment    String?
+
+  medicineId String
+  customerId String
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  medicine   Medicine @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+  customer   User     @relation("CustomerReviews", fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, medicineId])  // one review per customer per medicine
+
+  @@map("reviews")
+}

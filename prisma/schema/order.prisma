@@ -1,0 +1,22 @@
+enum OrderStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id           String       @id @default(uuid())
+  customerId   String
+  totalAmount  Float
+  status       OrderStatus  @default(PENDING)
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  customer     User         @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: Cascade)
+
+  items        OrderItem[]
+
+  @@map("orders")
+}
