@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { CategoryRoutes } from "./modules/category/category.route";
 // import { postRouter } from "./modules/post/post.router";
 // import { toNodeHandler } from "better-auth/node";
 // import { auth } from "./lib/auth";
@@ -21,6 +22,7 @@ app.use(express.json());
 // app.use("/posts", postRouter);
 // app.use("/comments", commentRouter);
 
+app.use("/api/categories", CategoryRoutes);
 
 app.get("/", (req, res) => {
     res.send("Hello, World!");
