@@ -2,11 +2,11 @@ import express from "express";
 import cors from "cors";
 import { CategoryRoutes } from "./modules/category/category.route";
 // import { postRouter } from "./modules/post/post.router";
-// import { toNodeHandler } from "better-auth/node";
-// import { auth } from "./lib/auth";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth";
 // import { commentRouter } from "./modules/comment/comment.router";
 // import errorHandler from "./middlewares/globalErrorHandler";
-// import { notFound } from "./middlewares/notFound";
+import { notFound } from "./middlewares/notFound";
 
 const app = express();
 
@@ -15,20 +15,20 @@ app.use(cors({
     credentials: true,
 }))
 
-// app.all("/api/auth/*splat", toNodeHandler(auth));
+app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
 
 // app.use("/posts", postRouter);
 // app.use("/comments", commentRouter);
 
-app.use("/api/categories", CategoryRoutes);
+app.use("/api/v1/categories", CategoryRoutes);
 
 app.get("/", (req, res) => {
     res.send("Hello, World!");
 });
 
-// app.use(notFound);
+app.use(notFound);
 
 // app.use(errorHandler)
 
