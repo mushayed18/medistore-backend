@@ -10,6 +10,7 @@ model User {
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+  role          UserRole  @default(CUSTOMER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
@@ -17,8 +18,8 @@ model User {
 
   // Relations
   medicines Medicine[] @relation("SellerMedicines")
-  orders    Order[]   @relation("CustomerOrders")
-  reviews   Review[]  @relation("CustomerReviews")
+  orders    Order[]    @relation("CustomerOrders")
+  reviews   Review[]   @relation("CustomerReviews")
 
   @@unique([email])
   @@map("user")

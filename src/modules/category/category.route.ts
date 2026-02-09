@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { CategoryController } from "./category.controller";
+import { adminOnly } from "../../middlewares/adminOnly";
 
 const router = Router();
 
-router.post("/", CategoryController.createCategory);
+router.post("/", adminOnly, CategoryController.createCategory);
 router.get("/", CategoryController.getAllCategories);
 router.get("/:id", CategoryController.getCategoryById);
-router.patch("/:id", CategoryController.updateCategory);
-router.delete("/:id", CategoryController.deleteCategory);
+router.patch("/:id", adminOnly, CategoryController.updateCategory);
+router.delete("/:id", adminOnly, CategoryController.deleteCategory);
 
 export const CategoryRoutes = router;
