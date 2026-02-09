@@ -1,0 +1,28 @@
+import { Request, Response, NextFunction } from "express";
+import { auth } from "../lib/auth";
+import { nodeHeadersToWebHeaders } from "../utils/nodeHeadersToWebHeaders";
+
+export const sellerOrAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const session = await auth.api.getSession({
+      headers: nodeHeadersToWebHeaders(req.headers),
+    });
+
+    if (!session) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    if (session.user.role !== "SELLER" && session.user.role !== "ADMIN") {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden - Only sellers or admins can perform this action",
+      });
+    }
+
+    req.user = session.user;
+    next();
+  } catch (error) {
+    console.error("sellerOrAdmin error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

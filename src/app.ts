@@ -1,12 +1,11 @@
 import express from "express";
 import cors from "cors";
 import { CategoryRoutes } from "./modules/category/category.route";
-// import { postRouter } from "./modules/post/post.router";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
-// import { commentRouter } from "./modules/comment/comment.router";
 // import errorHandler from "./middlewares/globalErrorHandler";
 import { notFound } from "./middlewares/notFound";
+import { MedicineRoutes } from "./modules/medicine/medicine.route";
 
 const app = express();
 
@@ -19,10 +18,8 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
 
-// app.use("/posts", postRouter);
-// app.use("/comments", commentRouter);
-
 app.use("/api/v1/categories", CategoryRoutes);
+app.use("/api/v1/medicines", MedicineRoutes);
 
 app.get("/", (req, res) => {
     res.send("Hello, World!");
