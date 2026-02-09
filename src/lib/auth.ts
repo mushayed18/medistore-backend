@@ -12,6 +12,9 @@ export const auth = betterAuth({
         type: "string",
         required: true,
         validate: (value: string) => {
+          if (value === "ADMIN") {
+            throw new Error("ADMIN role cannot be assigned");
+          }
           if (value !== "CUSTOMER" && value !== "SELLER") {
             throw new Error("Invalid role");
           }
