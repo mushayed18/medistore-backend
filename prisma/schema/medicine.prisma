@@ -1,21 +1,22 @@
 model Medicine {
-  id          String    @id @default(uuid())
-  name        String
-  description String?
-  price       Float
-  stock       Int       @default(0)
+  id           String  @id @default(uuid())
+  name         String
+  description  String?
+  price        Float
+  stock        Int     @default(0)
+  manufacturer String?
 
-  sellerId    String
-  categoryId  String
+  sellerId   String
+  categoryId String
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  seller      User      @relation("SellerMedicines", fields: [sellerId], references: [id], onDelete: Cascade)
-  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  seller   User     @relation("SellerMedicines", fields: [sellerId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
-  orderItems  OrderItem[]
-  reviews     Review[]
+  orderItems OrderItem[]
+  reviews    Review[]
 
   @@map("medicines")
 }

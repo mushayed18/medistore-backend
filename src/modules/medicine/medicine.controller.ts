@@ -3,16 +3,23 @@ import { MedicineService } from "./medicine.service";
 
 const getAllMedicines = async (req: Request, res: Response) => {
   try {
-    const { search, categoryId } = req.query; // support both search & category filter
+    const { search, categoryId, minPrice, maxPrice, manufacturer, page, limit, sortBy, sortOrder } = req.query;
 
-    const medicines = await MedicineService.getAllMedicines({
+    const result = await MedicineService.getAllMedicines({
       search: search ? String(search) : undefined,
       categoryId: categoryId ? String(categoryId) : undefined,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      manufacturer: manufacturer ? String(manufacturer) : undefined,
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+      sortBy: sortBy ? String(sortBy) : undefined,
+      sortOrder: sortOrder === "asc" ? "asc" : "desc",
     });
 
     res.status(200).json({
       success: true,
-      data: medicines,
+      ...result,
     });
   } catch (error) {
     console.error("getAllMedicines error:", error);

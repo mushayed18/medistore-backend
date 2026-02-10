@@ -1,27 +1,87 @@
 import { prisma } from "../../lib/prisma";
 
-const getAllMedicines = async (options: {
-  search?: string | undefined;
-  categoryId?: string | undefined;
-}) => {
-  const { search, categoryId } = options;
+export const getAllMedicines = async (
+  options: {
+    search?: string | undefined;
+    categoryId?: string | undefined;
+    manufacturer?: string | undefined;
+    minPrice?: number | undefined;
+    maxPrice?: number | undefined;
+    page?: number | undefined;
+    limit?: number | undefined;
+    sortBy?: string | undefined;
+    sortOrder?: "asc" | "desc";
+  } = {},
+) => {
+  // ── Default values ────────────────────────────────────────
+  const page = Math.max(1, options.page ?? 1);
+  const limit = Math.max(1, Math.min(100, options.limit ?? 10)); // prevent abuse
+  const skip = (page - 1) * limit;
 
-  return prisma.medicine.findMany({
-    where: {
-      ...(search && {
-        name: {
-          contains: search,
-          mode: "insensitive", // case-insensitive search
-        },
-      }),
-      ...(categoryId && { categoryId }),
+  const sortBy = options.sortBy ?? "createdAt";
+  const sortOrder = options.sortOrder === "asc" ? "asc" : "desc";
+
+  // ── Build where clause ────────────────────────────────────
+  const where: any = {};
+
+  if (options.search) {
+    where.name = {
+      contains: options.search,
+      mode: "insensitive",
+    };
+  }
+
+  if (options.categoryId) {
+    where.categoryId = options.categoryId;
+  }
+
+  if (options.manufacturer) {
+    where.manufacturer = {
+      contains: options.manufacturer,
+      mode: "insensitive",
+    };
+  }
+
+  if (options.minPrice !== undefined || options.maxPrice !== undefined) {
+    where.price = {};
+
+    if (options.minPrice !== undefined) {
+      where.price.gte = Number(options.minPrice);
+    }
+    if (options.maxPrice !== undefined) {
+      where.price.lte = Number(options.maxPrice);
+    }
+  }
+
+  // ── Get total count for pagination ────────────────────────
+  const total = await prisma.medicine.count({ where });
+
+  // ── Fetch paginated medicines ─────────────────────────────
+  const medicines = await prisma.medicine.findMany({
+    where,
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
     },
-    orderBy: { createdAt: "desc" },
     include: {
       category: { select: { name: true } },
       seller: { select: { name: true } },
     },
   });
+
+  // ── Build response with meta ──────────────────────────────
+  return {
+    data: medicines,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page * limit < total,
+      hasPrevPage: page > 1,
+    },
+  };
 };
 
 const getMedicineById = async (id: string) => {
