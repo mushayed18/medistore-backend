@@ -100,8 +100,84 @@ const getOrderById = async (req: Request, res: Response) => {
   }
 };
 
+const updateOrderStatus = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const currentUser = req.user!; // from sellerOrAdmin middleware
+
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message: "New status is required",
+      });
+    }
+
+    const updatedOrder = await OrderService.updateOrderStatus(
+      id as string,
+      status,
+      currentUser
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Order status updated successfully",
+      data: updatedOrder,
+    });
+  } catch (error: any) {
+    console.error("Update order status error:", error.message);
+
+    if (error.message.includes("not found")) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    if (error.message.includes("Invalid status")) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to update order status",
+    });
+  }
+};
+
+const getAllOrders = async (req: Request, res: Response) => {
+  try {
+    const currentUser = req.user!; // from sellerOrAdmin middleware
+    const { page, limit, sortBy, sortOrder } = req.query;
+
+    const result = await OrderService.getAllOrders(currentUser, {
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+      sortBy: sortBy ? String(sortBy) : undefined,
+      sortOrder: sortOrder ? String(sortOrder) : undefined,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: result.data,
+      meta: result.meta,
+    });
+  } catch (error: any) {
+    console.error("Get all orders error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch all orders",
+    });
+  }
+};
+
 export const OrderController = {
   createOrder,
   getMyOrders,
   getOrderById,
+  updateOrderStatus,
+  getAllOrders,
 };

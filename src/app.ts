@@ -7,6 +7,7 @@ import { auth } from "./lib/auth";
 import { notFound } from "./middlewares/notFound";
 import { MedicineRoutes } from "./modules/medicine/medicine.route";
 import { OrderRoutes } from "./modules/order/order.route";
+import { ReviewRoutes } from "./modules/review/review.route";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use("/api/v1/categories", CategoryRoutes);
 app.use("/api/v1/medicines", MedicineRoutes);
 app.use("/api/v1/orders", OrderRoutes);
+app.use("/api/v1/reviews", ReviewRoutes);
 
 app.get("/", (req, res) => {
     res.send("Hello, World!");

@@ -100,6 +100,22 @@ const getMedicineById = async (id: string) => {
           name: true,
         },
       },
+      reviews: {
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+          createdAt: true,
+          customer: {
+            select: {
+              name: true,           
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",     
+        },
+      },
     },
   });
 };
