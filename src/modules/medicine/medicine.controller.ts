@@ -166,10 +166,39 @@ const deleteMedicine = async (req: Request, res: Response) => {
   }
 };
 
+const getMyMedicines = async (req: Request, res: Response) => {
+  try {
+    const sellerId = req.user!.id; // from sellerOnly middleware
+
+    // Get query params for pagination & sorting
+    const { page, limit, sortBy, sortOrder } = req.query;
+
+    const result = await MedicineService.getMyMedicines(sellerId, {
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+      sortBy: sortBy ? String(sortBy) : undefined,
+      sortOrder: sortOrder ? String(sortOrder) : undefined,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: result.data,
+      meta: result.meta,
+    });
+  } catch (error: any) {
+    console.error("Get my medicines error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch your medicines",
+    });
+  }
+};
+
 export const MedicineController = {
   getAllMedicines,
   getMedicineById,
   createMedicine,
   updateMedicine,
   deleteMedicine,
+  getMyMedicines,
 };

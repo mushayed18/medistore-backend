@@ -108,12 +108,12 @@ const getMedicineById = async (id: string) => {
           createdAt: true,
           customer: {
             select: {
-              name: true,           
+              name: true,
             },
           },
         },
         orderBy: {
-          createdAt: "desc",     
+          createdAt: "desc",
         },
       },
     },
@@ -201,10 +201,64 @@ const deleteMedicine = async (
   });
 };
 
+const getMyMedicines = async (
+  sellerId: string,
+  options: {
+    page?: number | undefined;
+    limit?: number | undefined;
+    sortBy?: string | undefined;
+    sortOrder?: string | undefined;
+  } = {},
+) => {
+  // Pagination defaults (same as your other lists)
+  const page = Math.max(1, options.page ?? 1);
+  const limit = Math.max(1, Math.min(50, options.limit ?? 10));
+  const skip = (page - 1) * limit;
+
+  const sortBy = options.sortBy ?? "createdAt";
+  const sortOrder = options.sortOrder === "asc" ? "asc" : "desc";
+
+  // Count total medicines owned by this seller
+  const total = await prisma.medicine.count({
+    where: { sellerId },
+  });
+
+  // Fetch paginated medicines for this seller
+  const medicines = await prisma.medicine.findMany({
+    where: {
+      sellerId, // ← only this seller's medicines
+    },
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include: {
+      category: {
+        select: { name: true },
+      },
+      // Optional: include stock status or other useful info
+    },
+  });
+
+  return {
+    data: medicines,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page * limit < total,
+      hasPrevPage: page > 1,
+    },
+  };
+};
+
 export const MedicineService = {
   getAllMedicines,
   getMedicineById,
   createMedicine,
   updateMedicine,
   deleteMedicine,
+  getMyMedicines,
 };

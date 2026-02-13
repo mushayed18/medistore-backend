@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { MedicineController } from "./medicine.controller";
 import { sellerOrAdmin } from "../../middlewares/sellerOrAdmin";
+import { sellerOnly } from "../../middlewares/sellerOnly";
 
 const router = Router();
 
@@ -9,6 +10,8 @@ router.get("/", MedicineController.getAllMedicines);
 router.get("/:id", MedicineController.getMedicineById);
 
 // Protected seller-only routes
+router.get("/my-medicines", sellerOnly, MedicineController.getMyMedicines);
+
 router.post("/", sellerOrAdmin, MedicineController.createMedicine);
 router.patch("/:id", sellerOrAdmin, MedicineController.updateMedicine);
 router.delete("/:id", sellerOrAdmin, MedicineController.deleteMedicine);
