@@ -174,10 +174,55 @@ const getAllOrders = async (req: Request, res: Response) => {
   }
 };
 
+const cancelOrder = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const customerId = req.user!.id;
+
+    const cancelledOrder = await OrderService.cancelOrder(id as string, customerId);
+
+    res.status(200).json({
+      success: true,
+      message: "Order cancelled successfully",
+      data: cancelledOrder,
+    });
+  } catch (error: any) {
+    console.error("Cancel order error:", error.message);
+
+    if (error.message.includes("not found")) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    if (error.message.includes("Unauthorized")) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only cancel your own orders",
+      });
+    }
+
+    if (error.message.includes("Cannot cancel order")) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,  
+      });
+    }
+
+    // Fallback for unexpected errors
+    res.status(500).json({
+      success: false,
+      message: "Failed to cancel order",
+    });
+  }
+};
+
 export const OrderController = {
   createOrder,
   getMyOrders,
   getOrderById,
   updateOrderStatus,
   getAllOrders,
+  cancelOrder,
 };

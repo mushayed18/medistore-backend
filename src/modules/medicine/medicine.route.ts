@@ -5,12 +5,12 @@ import { sellerOnly } from "../../middlewares/sellerOnly";
 
 const router = Router();
 
+// Protected seller-only routes
+router.get("/my-medicines", sellerOnly, MedicineController.getMyMedicines);
+
 // Public / customer-facing routes
 router.get("/", MedicineController.getAllMedicines);
 router.get("/:id", MedicineController.getMedicineById);
-
-// Protected seller-only routes
-router.get("/my-medicines", sellerOnly, MedicineController.getMyMedicines);
 
 router.post("/", sellerOrAdmin, MedicineController.createMedicine);
 router.patch("/:id", sellerOrAdmin, MedicineController.updateMedicine);

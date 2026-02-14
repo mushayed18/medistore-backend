@@ -289,10 +289,63 @@ const getAllOrders = async (
   };
 };
 
+const cancelOrder = async (orderId: string, customerId: string) => {
+  return prisma.$transaction(async (tx) => {
+    // 1. Find the order + items + medicines
+    const order = await tx.order.findUnique({
+      where: { id: orderId },
+      include: {
+        items: {
+          include: {
+            medicine: {
+              select: { id: true, stock: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    // 2. Authorization: only owner can cancel
+    if (order.customerId !== customerId) {
+      throw new Error("Unauthorized - You can only cancel your own orders");
+    }
+
+    // 3. Business rule: only PENDING orders can be cancelled
+    if (order.status !== "PENDING") {
+      throw new Error("Cannot cancel order - status is already " + order.status);
+    }
+
+    // 4. Restore stock for all items
+    for (const item of order.items) {
+      await tx.medicine.update({
+        where: { id: item.medicine.id },
+        data: {
+          stock: { increment: item.quantity },
+        },
+      });
+    }
+
+    // 5. Update order status to CANCELLED
+    const cancelledOrder = await tx.order.update({
+      where: { id: orderId },
+      data: {
+        status: "CANCELLED",
+      },
+    });
+
+    return cancelledOrder;
+  });
+};
+
 export const OrderService = {
   createOrder,
   getMyOrders,
   getOrderById,
   getAllOrders,
   updateOrderStatus,
+  cancelOrder,
 };
