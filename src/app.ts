@@ -8,6 +8,7 @@ import { notFound } from "./middlewares/notFound";
 import { MedicineRoutes } from "./modules/medicine/medicine.route";
 import { OrderRoutes } from "./modules/order/order.route";
 import { ReviewRoutes } from "./modules/review/review.route";
+import { UserRoutes } from "./modules/user/user.route";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api/v1/categories", CategoryRoutes);
 app.use("/api/v1/medicines", MedicineRoutes);
 app.use("/api/v1/orders", OrderRoutes);
 app.use("/api/v1/reviews", ReviewRoutes);
+app.use("/api/v1/users", UserRoutes);
 
 app.get("/", (req, res) => {
     res.send("Hello, World!");
