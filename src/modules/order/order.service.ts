@@ -6,6 +6,11 @@ type CreateOrderInput = {
     medicineId: string;
     quantity: number;
   }>;
+  shippingName: string;
+  shippingPhone: string;
+  shippingAddress: string;
+  shippingCity: string;
+  shippingZip: string;
 };
 
 const createOrder = async (customerId: string, input: CreateOrderInput) => {
@@ -45,6 +50,11 @@ const createOrder = async (customerId: string, input: CreateOrderInput) => {
         customerId,
         totalAmount,
         status: "PENDING",
+        shippingName: input.shippingName,
+        shippingPhone: input.shippingPhone,
+        shippingAddress: input.shippingAddress,
+        shippingCity: input.shippingCity,
+        shippingZip: input.shippingZip,
       },
     });
 
@@ -316,7 +326,9 @@ const cancelOrder = async (orderId: string, customerId: string) => {
 
     // 3. Business rule: only PENDING orders can be cancelled
     if (order.status !== "PENDING") {
-      throw new Error("Cannot cancel order - status is already " + order.status);
+      throw new Error(
+        "Cannot cancel order - status is already " + order.status,
+      );
     }
 
     // 4. Restore stock for all items

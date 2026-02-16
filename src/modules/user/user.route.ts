@@ -9,9 +9,9 @@ const router = Router();
 router.get("/me", authMiddleware, UserController.getCurrentUser);
 
 // 2. Update own profile
-// router.patch("/me", authMiddleware, UserController.updateCurrentUser);
+router.patch("/me", authMiddleware, UserController.updateCurrentUser);
 
 // 3. Admin list all users
-// router.get("/", adminOnly, UserController.getAllUsers);
+router.get("/", adminOnly, UserController.getAllUsers);
 
 export const UserRoutes = router;

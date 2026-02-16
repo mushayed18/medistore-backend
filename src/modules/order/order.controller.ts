@@ -3,8 +3,15 @@ import { OrderService } from "./order.service";
 
 const createOrder = async (req: Request, res: Response) => {
   try {
-    const customerId = req.user!.id; 
-    const { items } = req.body;
+    const customerId = req.user!.id;
+    const {
+      items,
+      shippingName,
+      shippingPhone,
+      shippingAddress,
+      shippingCity,
+      shippingZip,
+    } = req.body;
 
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({
@@ -13,7 +20,27 @@ const createOrder = async (req: Request, res: Response) => {
       });
     }
 
-    const order = await OrderService.createOrder(customerId, { items });
+    if (
+      !shippingAddress ||
+      !shippingPhone ||
+      !shippingName ||
+      !shippingCity ||
+      !shippingZip
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "All shipping details are required",
+      });
+    }
+
+    const order = await OrderService.createOrder(customerId, {
+      items,
+      shippingName,
+      shippingPhone,
+      shippingAddress,
+      shippingCity,
+      shippingZip,
+    });
 
     res.status(201).json({
       success: true,
@@ -23,7 +50,10 @@ const createOrder = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("Create order error:", error.message);
 
-    if (error.message.includes("Not enough stock") || error.message.includes("not found")) {
+    if (
+      error.message.includes("Not enough stock") ||
+      error.message.includes("not found")
+    ) {
       return res.status(400).json({
         success: false,
         message: error.message,
@@ -116,7 +146,7 @@ const updateOrderStatus = async (req: Request, res: Response) => {
     const updatedOrder = await OrderService.updateOrderStatus(
       id as string,
       status,
-      currentUser
+      currentUser,
     );
 
     res.status(200).json({
@@ -179,7 +209,10 @@ const cancelOrder = async (req: Request, res: Response) => {
     const { id } = req.params;
     const customerId = req.user!.id;
 
-    const cancelledOrder = await OrderService.cancelOrder(id as string, customerId);
+    const cancelledOrder = await OrderService.cancelOrder(
+      id as string,
+      customerId,
+    );
 
     res.status(200).json({
       success: true,
@@ -206,7 +239,7 @@ const cancelOrder = async (req: Request, res: Response) => {
     if (error.message.includes("Cannot cancel order")) {
       return res.status(400).json({
         success: false,
-        message: error.message,  
+        message: error.message,
       });
     }
 
