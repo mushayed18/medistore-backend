@@ -8,6 +8,8 @@ const getCurrentUser = async (userId: string) => {
       name: true,
       email: true,
       role: true,
+      phone: true,
+      address: true,
       status: true,
       createdAt: true,
       updatedAt: true,
@@ -21,7 +23,20 @@ const getCurrentUser = async (userId: string) => {
   return user;
 };
 
-const updateCurrentUser = async (userId: string, data: { name: string }) => {
+const updateCurrentUser = async (
+  userId: string,
+  data: {
+    name?: string;
+    phone?: string;
+    address?: string;
+  },
+) => {
+  const updateData: any = {};
+
+  if (data.name !== undefined) updateData.name = data.name;
+  if (data.phone !== undefined) updateData.phone = data.phone;
+  if (data.address !== undefined) updateData.address = data.address;
+
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
@@ -32,14 +47,14 @@ const updateCurrentUser = async (userId: string, data: { name: string }) => {
 
   const updated = await prisma.user.update({
     where: { id: userId },
-    data: {
-      name: data.name,
-    },
+    data: updateData,
     select: {
       id: true,
       name: true,
       email: true,
       role: true,
+      phone: true,
+      address: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -67,6 +82,8 @@ const getAllUsers = async (
       id: true,
       name: true,
       email: true,
+      phone: true,
+      address: true,
       role: true,
       createdAt: true,
       updatedAt: true,

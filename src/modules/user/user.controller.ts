@@ -23,18 +23,42 @@ const getCurrentUser = async (req: Request, res: Response) => {
 const updateCurrentUser = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
-    const { name } = req.body;
+    const { name, phone, address } = req.body;
 
-    // Validation: at least name must be provided
-    if (!name || typeof name !== "string" || name.trim() === "") {
+    // At least one field must be provided
+    if (!name && !phone && !address) {
       return res.status(400).json({
         success: false,
-        message: "Name is required and cannot be empty",
+        message: "Provide name, phone, or address to update",
+      });
+    }
+
+    // Optional: basic validation
+    if (name && (typeof name !== "string" || name.trim() === "")) {
+      return res.status(400).json({
+        success: false,
+        message: "Name cannot be empty",
+      });
+    }
+
+    if (phone && (typeof phone !== "string" || phone.trim() === "")) {
+      return res.status(400).json({
+        success: false,
+        message: "Phone cannot be empty",
+      });
+    }
+
+    if (address && (typeof address !== "string" || address.trim() === "")) {
+      return res.status(400).json({
+        success: false,
+        message: "Address cannot be empty",
       });
     }
 
     const updatedUser = await UserService.updateCurrentUser(userId, {
-      name: name.trim(),
+      name: name ? name.trim() : undefined,
+      phone: phone ? phone.trim() : undefined,
+      address: address ? address.trim() : undefined,
     });
 
     res.status(200).json({
