@@ -15,6 +15,13 @@ export const sellerOnly = async (req: Request, res: Response, next: NextFunction
       });
     }
 
+    if (session.user.status === "BANNED") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is banned. Please contact support.",
+      });
+    }
+
     if (session.user.role !== "SELLER") {
       return res.status(403).json({
         success: false,

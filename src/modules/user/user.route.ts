@@ -14,4 +14,7 @@ router.patch("/me", authMiddleware, UserController.updateCurrentUser);
 // 3. Admin list all users
 router.get("/", adminOnly, UserController.getAllUsers);
 
+// Ban/Unban user (admin only)
+router.patch("/:id/status", adminOnly, UserController.updateUserStatus);
+
 export const UserRoutes = router;

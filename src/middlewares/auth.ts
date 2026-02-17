@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { auth } from "../lib/auth"; 
-import { nodeHeadersToWebHeaders } from "../utils/nodeHeadersToWebHeaders"; 
+import { auth } from "../lib/auth";
+import { nodeHeadersToWebHeaders } from "../utils/nodeHeadersToWebHeaders";
 
 export const authMiddleware = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const session = await auth.api.getSession({
@@ -16,6 +16,13 @@ export const authMiddleware = async (
       return res.status(401).json({
         success: false,
         message: "Unauthorized - Please login",
+      });
+    }
+
+    if (session.user.status === "BANNED") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is banned. Please contact support.",
       });
     }
 

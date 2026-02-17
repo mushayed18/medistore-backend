@@ -12,6 +12,13 @@ export const sellerOrAdmin = async (req: Request, res: Response, next: NextFunct
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
+    if (session.user.status === "BANNED") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is banned. Please contact support.",
+      });
+    }
+
     if (session.user.role !== "SELLER" && session.user.role !== "ADMIN") {
       return res.status(403).json({
         success: false,

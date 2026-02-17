@@ -21,6 +21,16 @@ export const auth = betterAuth({
         },
         defaultValue: "CUSTOMER",
       },
+      status: {
+        type: "string",
+        required: true, // or false if you want it optional
+        defaultValue: "ACTIVE", // default for new users
+        validate: (value: string) => {
+          if (value !== "ACTIVE" && value !== "BANNED") {
+            throw new Error("Invalid status");
+          }
+        },
+      },
     },
   },
   emailAndPassword: {

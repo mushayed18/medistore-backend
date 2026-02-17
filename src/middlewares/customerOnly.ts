@@ -13,6 +13,13 @@ export const customerOnly = async (req: Request, res: Response, next: NextFuncti
       return res.status(401).json({ success: false, message: "Please login" });
     }
 
+    if (session.user.status === "BANNED") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is banned. Please contact support.",
+      });
+    }
+
     if (session.user.role !== "CUSTOMER") {
       return res.status(403).json({
         success: false,
