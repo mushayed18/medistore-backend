@@ -12,25 +12,35 @@ import { UserRoutes } from "./modules/user/user.route";
 
 const app = express();
 
+// Configure CORS to allow both production and Vercel preview deployments
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://medistore-frontend-delta.vercel.app", // Production frontend URL
+].filter(Boolean); // Remove undefined values
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = [
-        "http://localhost:3000",                        // local dev (frontend)
-        "https://medistore-frontend-delta.vercel.app",  // live Vercel frontend
-      ];
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
 
-      // Allow requests with no origin (Postman, curl, mobile apps, etc.)
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Check if origin is in allowedOrigins or matches Vercel preview pattern
+      const isAllowed =
+        allowedOrigins.includes(origin) ||
+        /^https:\/\/next-blog-client.*\.vercel\.app$/.test(origin) ||
+        /^https:\/\/.*\.vercel\.app$/.test(origin); // Any Vercel deployment
+
+      if (isAllowed) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
       }
     },
-    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS", "PUT"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, // required for cookies/sessions/auth
-  })
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposedHeaders: ["Set-Cookie"],
+  }),
 );
 
 // Explicitly handle preflight OPTIONS requests (fixes some browser issues)
