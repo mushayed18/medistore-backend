@@ -1,0 +1,1 @@
+{"version":3,"file":"nodeHeadersToWebHeaders.d.ts","sourceRoot":"","sources":["../../src/utils/nodeHeadersToWebHeaders.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,mBAAmB,EAAE,MAAM,MAAM,CAAC;AAE3C,wBAAgB,uBAAuB,CACrC,OAAO,EAAE,mBAAmB,GAC3B,OAAO,CAcT"}

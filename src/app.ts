@@ -13,7 +13,7 @@ import { UserRoutes } from "./modules/user/user.route";
 const app = express();
 
 app.use(cors({
-    origin: process.env.APP_URL || "http://localhost:3000",
+    origin: process.env.APP_URL,
     credentials: true,
 }))
 

@@ -1,0 +1,1 @@
+{"version":3,"file":"adminOnly.d.ts","sourceRoot":"","sources":["../../src/middlewares/adminOnly.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,YAAY,EAAE,MAAM,SAAS,CAAC;AAI1D,eAAO,MAAM,SAAS,GACpB,KAAK,OAAO,EACZ,KAAK,QAAQ,EACb,MAAM,YAAY,4DAyBnB,CAAC"}

@@ -42,7 +42,7 @@ const createReview = async (req: Request, res: Response) => {
       });
     }
 
-    if (error.message.includes("not purchased")) {
+    if (error.message.includes("You can only review medicines you have purchased")) {
       return res.status(403).json({
         success: false,
         message: error.message,

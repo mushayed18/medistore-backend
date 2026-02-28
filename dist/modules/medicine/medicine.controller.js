@@ -1,0 +1,178 @@
+import { MedicineService } from "./medicine.service";
+const getAllMedicines = async (req, res) => {
+    try {
+        const { search, categoryId, minPrice, maxPrice, manufacturer, page, limit, sortBy, sortOrder } = req.query;
+        const result = await MedicineService.getAllMedicines({
+            search: search ? String(search) : undefined,
+            categoryId: categoryId ? String(categoryId) : undefined,
+            minPrice: minPrice ? Number(minPrice) : undefined,
+            maxPrice: maxPrice ? Number(maxPrice) : undefined,
+            manufacturer: manufacturer ? String(manufacturer) : undefined,
+            page: page ? Number(page) : undefined,
+            limit: limit ? Number(limit) : undefined,
+            sortBy: sortBy ? String(sortBy) : undefined,
+            sortOrder: sortOrder === "asc" ? "asc" : "desc",
+        });
+        res.status(200).json({
+            success: true,
+            ...result,
+        });
+    }
+    catch (error) {
+        console.error("getAllMedicines error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch medicines",
+        });
+    }
+};
+const getMedicineById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const medicine = await MedicineService.getMedicineById(id);
+        if (!medicine) {
+            return res.status(404).json({
+                success: false,
+                message: "Medicine not found",
+            });
+        }
+        res.status(200).json({
+            success: true,
+            data: medicine,
+        });
+    }
+    catch (error) {
+        console.error("getMedicineById error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch medicine",
+        });
+    }
+};
+const createMedicine = async (req, res) => {
+    try {
+        // req.user comes from sellerOnly middleware
+        const sellerId = req.user.id; // TypeScript needs help here
+        const medicine = await MedicineService.createMedicine({
+            ...req.body,
+            sellerId,
+        });
+        res.status(201).json({
+            success: true,
+            data: medicine,
+        });
+    }
+    catch (error) {
+        console.error("createMedicine error:", error);
+        if (error.code === "P2002") {
+            return res.status(409).json({
+                success: false,
+                message: "Duplicate entry (possibly unique constraint violation)",
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: "Failed to create medicine",
+        });
+    }
+};
+const updateMedicine = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = req.user;
+        const updated = await MedicineService.updateMedicine(id, req.body, {
+            id: user.id,
+            role: user.role,
+        });
+        res.status(200).json({
+            success: true,
+            data: updated,
+        });
+    }
+    catch (error) {
+        console.error("updateMedicine error:", error);
+        if (error.message?.includes("not found")) {
+            return res.status(404).json({
+                success: false,
+                message: "Medicine not found",
+            });
+        }
+        if (error.message?.includes("own medicines")) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only update your own medicines",
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: "Failed to update medicine",
+        });
+    }
+};
+const deleteMedicine = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = req.user;
+        await MedicineService.deleteMedicine(id, {
+            id: user.id,
+            role: user.role,
+        });
+        res.status(200).json({
+            success: true,
+            message: "Medicine deleted successfully",
+        });
+    }
+    catch (error) {
+        console.error("deleteMedicine error:", error);
+        if (error.message?.includes("not found")) {
+            return res.status(404).json({
+                success: false,
+                message: "Medicine not found",
+            });
+        }
+        if (error.message?.includes("own medicines")) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only delete your own medicines",
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: "Failed to delete medicine",
+        });
+    }
+};
+const getMyMedicines = async (req, res) => {
+    try {
+        const sellerId = req.user.id; // from sellerOnly middleware
+        // Get query params for pagination & sorting
+        const { page, limit, sortBy, sortOrder } = req.query;
+        const result = await MedicineService.getMyMedicines(sellerId, {
+            page: page ? Number(page) : undefined,
+            limit: limit ? Number(limit) : undefined,
+            sortBy: sortBy ? String(sortBy) : undefined,
+            sortOrder: sortOrder ? String(sortOrder) : undefined,
+        });
+        res.status(200).json({
+            success: true,
+            data: result.data,
+            meta: result.meta,
+        });
+    }
+    catch (error) {
+        console.error("Get my medicines error:", error.message);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch your medicines",
+        });
+    }
+};
+export const MedicineController = {
+    getAllMedicines,
+    getMedicineById,
+    createMedicine,
+    updateMedicine,
+    deleteMedicine,
+    getMyMedicines,
+};
+//# sourceMappingURL=medicine.controller.js.map
