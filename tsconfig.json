@@ -42,7 +42,7 @@
     "esModuleInterop": true,
     // "ignoreDeprecations": "6.0",
     // "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
+    // "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
