@@ -18,7 +18,6 @@ app.use(
       const allowedOrigins = [
         "http://localhost:3000",                        // local dev (frontend)
         "https://medistore-frontend-delta.vercel.app",  // live Vercel frontend
-        // Add any other frontend URLs if you have (e.g. staging)
       ];
 
       // Allow requests with no origin (Postman, curl, mobile apps, etc.)
@@ -37,7 +36,7 @@ app.use(
 // Explicitly handle preflight OPTIONS requests (fixes some browser issues)
 app.options("*", cors());
 
-app.all("/api/auth/*splat", toNodeHandler(auth));
+app.all("/api/auth/*", toNodeHandler(auth));
 
 app.use(express.json());
 
