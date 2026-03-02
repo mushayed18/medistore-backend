@@ -161,7 +161,7 @@ const deleteMedicine = async (req: Request, res: Response) => {
 
     res.status(500).json({
       success: false,
-      message: "Failed to delete medicine",
+      message: "This medicine cannot be deleted (it may be associated with existing orders or reviews)",
     });
   }
 };

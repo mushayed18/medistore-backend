@@ -5,13 +5,14 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node --no-warnings --experimental-specifier-resolution=node --loader ts-node/esm dist/server.js"
+    "start": "node --no-warnings --experimental-specifier-resolution=node --loader ts-node/esm dist/server.js",
+    "build": "prisma generate && tsup src/index.ts --format esm --platform node --target node20 --outDir api --external pg-native",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",

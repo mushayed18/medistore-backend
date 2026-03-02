@@ -3,7 +3,6 @@ import cors from "cors";
 import { CategoryRoutes } from "./modules/category/category.route";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
-// import errorHandler from "./middlewares/globalErrorHandler";
 import { notFound } from "./middlewares/notFound";
 import { MedicineRoutes } from "./modules/medicine/medicine.route";
 import { OrderRoutes } from "./modules/order/order.route";
@@ -12,41 +11,28 @@ import { UserRoutes } from "./modules/user/user.route";
 
 const app = express();
 
-// Configure CORS to allow both production and Vercel preview deployments
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://medistore-frontend-delta.vercel.app", // Production frontend URL
-].filter(Boolean); // Remove undefined values
-
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, Postman, etc.)
-      if (!origin) return callback(null, true);
+      const allowedOrigins = [
+        "http://localhost:3000",                        // local dev (frontend)
+        "https://medistore-frontend-delta.vercel.app",  // live Vercel frontend
+      ];
 
-      // Check if origin is in allowedOrigins or matches Vercel preview pattern
-      const isAllowed =
-        allowedOrigins.includes(origin) ||
-        /^https:\/\/next-blog-client.*\.vercel\.app$/.test(origin) ||
-        /^https:\/\/.*\.vercel\.app$/.test(origin); // Any Vercel deployment
-
-      if (isAllowed) {
+      // Allow requests with no origin (Postman, curl, mobile apps, etc.)
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error(`Origin ${origin} not allowed by CORS`));
+        callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
-    exposedHeaders: ["Set-Cookie"],
-  }),
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS", "PUT"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // required for cookies/sessions/auth
+  })
 );
 
-// Explicitly handle preflight OPTIONS requests (fixes some browser issues)
-app.options("*", cors());
-
-app.all("/api/auth/*", toNodeHandler(auth));
+app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
 
@@ -61,7 +47,5 @@ app.get("/", (req, res) => {
 });
 
 app.use(notFound);
-
-// app.use(errorHandler)
 
 export default app;
